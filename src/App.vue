@@ -1,28 +1,90 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-main class="d-flex align-center pa-10">
+      <v-card max-width="400"  class="mx-auto" tile>
+        <v-list flat>
+          <v-subheader>NOTES</v-subheader>
+          <v-list-item-group>
+            <v-list-item
+              @click="openDialog(null)"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-file-plus-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Add Note</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
+      <list
+        :notes="notes"
+        @openDialog="openDialog"
+      />
+      <app-dialog
+        :isOpened.sync="isDialogOpened"
+        :editableNote="currentNote"
+        :edit="editMode"
+        @saveNote="saveNote"
+        @deleteNote="deleteNote"
+      />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import list from './components/List';
+import appDialog from "./components/Dialog";
+import {Note} from "./store";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    list,
+    appDialog
+  },
+  data: () => ({
+    isDialogOpened: false,
+    currentNote: new Note(),
+    editMode: false
+  }),
+  computed: {
+    notes() {
+      return this.$store.getters.notes
+    }
+  },
+  methods: {
+    openDialog(note) {
+      if (note) {
+        this.editMode = true
+        this.currentNote = note
+      }
+      this.isDialogOpened = true
+    },
+    saveNote(note) {
+      if (this.editMode) {
+        this.$store.dispatch('editNote', note)
+      } else {
+        this.$store.dispatch('createNote', note)
+      }
+      this.clearState()
+    },
+    deleteNote(note) {
+      this.$store.dispatch('deleteNote', note)
+      this.clearState()
+    },
+    clearState() {
+      this.isDialogOpened = false
+      this.currentNote = new Note()
+      this.editMode = false
+    },
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+  html {
+    overflow-y: auto;
+  }
 </style>

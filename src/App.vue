@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="d-flex align-center pa-10">
+    <v-main class="d-flex align-center py-10">
       <v-card max-width="400"  class="mx-auto" tile>
         <v-list flat>
           <v-subheader>NOTES</v-subheader>
@@ -21,6 +21,7 @@
       <list
         :notes="notes"
         @openDialog="openDialog"
+        @deleteNote="deleteNote"
       />
       <app-dialog
         :isOpened.sync="isDialogOpened"
